@@ -14,7 +14,7 @@ public class Customer implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.sleep((long) (Math.random() * 1000));
+            Thread.sleep((long) (Math.random() * 50000));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -29,8 +29,38 @@ public class Customer implements Runnable {
         }
         msg("got a slip");
         pay(Math.random() < 0.5);
-        //closing time!
-        App.closed.release();
+        App.doneShopping.release();
+        try {
+            Thread.sleep((long) (Math.random() * 10000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        msg("waiting for the rest of the customers to pay");
+        try {
+            App.doneShopping.acquire(App.totalCustomers);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        App.doneShopping.release(App.totalCustomers);
+        // Everyone is done shopping here
+        App.incCustomersDoneShopping();
+        if (App.getCustomersDoneShopping() % App.minisize == 0
+                || App.getCustomersDoneShopping() == App.totalCustomers) {
+            for (int i = 1; i < App.minisize; i++) {
+                msg("we got a group");
+                App.group.release();
+            }
+        } else {
+            try {
+                msg("waiting for a group");
+                App.group.acquire();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        App.closed.release(); // closing time!
 
     }
 
@@ -43,7 +73,7 @@ public class Customer implements Runnable {
             App.waitingPayCash.release();
             msg("has decided to pay with cash");
             try {
-                Thread.sleep((long) (Math.random() * 1));
+                Thread.sleep((long) (Math.random() * 10000));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -52,7 +82,7 @@ public class Customer implements Runnable {
             App.waitingPayCredit.release();
             msg("has decided to pay with credit");
             try {
-                Thread.sleep((long) (Math.random() * 1));
+                Thread.sleep((long) (Math.random() * 10000));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

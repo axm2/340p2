@@ -10,6 +10,7 @@ public class App {
     static int totalClerks;
     static int totalCashiers;
     static int minisize;
+    static int customersDoneShopping;
     // Thread pointer arrays
     static Thread[] customerThreads;
     static Thread[] clerkThreads;
@@ -17,10 +18,13 @@ public class App {
     public static Semaphore semCustomers = new Semaphore(0);
     public static Semaphore semClerks = new Semaphore(0);
     public static Semaphore mutex = new Semaphore(1);
+    public static Semaphore mutex2 = new Semaphore(1);
     public static Semaphore clerkMutex = new Semaphore(1);
     public static Semaphore closed = new Semaphore(0);
     public static Semaphore waitingPayCash = new Semaphore(0);
     public static Semaphore waitingPayCredit = new Semaphore(0);
+    public static Semaphore doneShopping = new Semaphore(0);
+    public static Semaphore group = new Semaphore(0);
 
 
     public static void main(String[] args) throws Exception {
@@ -103,5 +107,29 @@ public class App {
         totalCustomersHelpedCashier++;
         mutex.release();
         
+    }
+    
+    public static int getCustomersDoneShopping(){
+        int result;
+        try {
+            mutex2.acquire();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            //e.printStackTrace();
+        }
+        result = customersDoneShopping;
+        mutex2.release();
+        return result;
+    }
+
+    public static void incCustomersDoneShopping(){
+        try {
+            mutex2.acquire();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            //e.printStackTrace();
+        }
+        customersDoneShopping++;
+        mutex2.release();
     }
 }

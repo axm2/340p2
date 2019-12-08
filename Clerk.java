@@ -28,11 +28,13 @@ public class Clerk implements Runnable {
             }
         }
         try {
+            msg("waiting for closing time");
             App.closed.acquire();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             //e.printStackTrace();
         }
+        msg("its closing time, going home!");
 
     }
 
